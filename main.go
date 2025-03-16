@@ -4,15 +4,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/nish1013/ai-claims-assessment/internal/api"
-	"log"
+	"github.com/sirupsen/logrus"
 	"os"
 	"strings"
 )
 
 func main() {
+	initLogger()
+
 	errLoadEnv := godotenv.Load()
 	if errLoadEnv != nil {
-		log.Println("Warning: No .env file found. Using default values.")
+		logrus.Warn("Warning: No .env file found. Using default values.")
 	}
 
 	router := gin.Default()
@@ -26,7 +28,7 @@ func main() {
 
 	errSetTrustProxy := router.SetTrustedProxies(trustedProxies)
 	if errSetTrustProxy != nil {
-		log.Fatalf("Failed to set trusted proxies: %v", errSetTrustProxy)
+		logrus.Fatalf("Failed to set trusted proxies: %v", errSetTrustProxy)
 	}
 
 	port := os.Getenv("PORT")
@@ -34,7 +36,15 @@ func main() {
 		port = "4003"
 	}
 
-	log.Printf("Starting server on port %s...", port)
+	logrus.WithFields(logrus.Fields{
+		"port": port,
+	}).Info("Starting server...")
 
 	router.Run(":" + port)
+}
+
+func initLogger() {
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.SetOutput(os.Stdout)
+	logrus.SetLevel(logrus.InfoLevel)
 }
