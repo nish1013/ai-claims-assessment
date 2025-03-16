@@ -6,16 +6,28 @@ import (
 	"github.com/nish1013/ai-claims-assessment/internal/api"
 	"log"
 	"os"
+	"strings"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
+	errLoadEnv := godotenv.Load()
+	if errLoadEnv != nil {
 		log.Println("Warning: No .env file found. Using default values.")
 	}
 
 	router := gin.Default()
 	api.RegisterRoutes(router)
+
+	proxyEnv := os.Getenv("TRUSTED_PROXIES")
+	var trustedProxies []string
+	if proxyEnv != "" {
+		trustedProxies = strings.Split(proxyEnv, ",")
+	}
+
+	errSetTrustProxy := router.SetTrustedProxies(trustedProxies)
+	if errSetTrustProxy != nil {
+		log.Fatalf("Failed to set trusted proxies: %v", errSetTrustProxy)
+	}
 
 	port := os.Getenv("PORT")
 	if port == "" {
