@@ -80,7 +80,7 @@ This repository contains a Golang-based AI microservice designed to assist insur
 { "summary": "Cargo lost in accident on 5th March 2025. No injuries, police report filed." }
 ```
 
-## c
+## Clone and build
 
 1. Clone the repository:
    ```sh
